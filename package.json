@@ -1,0 +1,50 @@
+{
+  "name": "zotero-api-client-cache",
+  "version": "0.1.0",
+  "description": "A caching layer for zotero-api-client",
+  "repository": "https://github.com/tnajdek/zotero-api-client-cache.git",
+  "main": "lib/main.js",
+  "author": "Tom Najdek",
+  "license": "AGPL-3.0",
+  "scripts": {
+    "test": "nyc mocha --compilers js:babel-register",
+    "coverage": "nyc --reporter=html --reporter=text mocha --compilers js:babel-register",
+    "coveralls": "nyc report --reporter=text-lcov | coveralls",
+    "test-watch": "mocha -w --compilers js:babel-register",
+    "prepack": "npm run build",
+    "postpack": "rimraf lib && rimraf build",
+    "build": "rimraf lib/* && rimraf build/* && run-p build:browser build:node",
+    "build:node": "mkdir -p lib/ && cd src && babel *.js -d ../lib",
+    "build:browser": "mkdir -p build/ && NODE_ENV=browser browserify -s zoteroApiClient -d src/api.js -t [babelify] -o build/zotero-api-client.js",
+    "start": "mocha -w --require babel-register"
+  },
+  "files": [
+    "build/*.js",
+    "lib/*.js"
+  ],
+  "dependencies": {
+    "zotero-api-client": "^0.9.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-plugin-transform-async-to-generator": "^6.24.1",
+    "babel-plugin-transform-object-rest-spread": "^6.23.0",
+    "babel-plugin-transform-regenerator": "^6.24.1",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-babili": "^0.1.4",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-register": "^6.24.1",
+    "babel-runtime": "^6.25.0",
+    "babelify": "^7.3.0",
+    "browserify": "^14.4.0",
+    "chai": "^4.1.0",
+    "coveralls": "^2.13.1",
+    "fetch-mock": "^5.12.1",
+    "live-reload": "^1.1.0",
+    "mocha": "^3.5.0",
+    "npm-run-all": "^4.0.2",
+    "nyc": "^11.1.0",
+    "rimraf": "^2.6.1",
+    "timekeeper": "^1.0.0"
+  }
+}
