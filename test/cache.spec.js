@@ -88,7 +88,7 @@ describe('Zotero Api Cache Plugin', () => {
 			ifModifiedSinceVersion: 42,
 			resource: {
 				library: 'u123',
-				items: 'ABCD2345'
+				items: 'IIJJKKLL'
 			}
 		});
 
@@ -232,40 +232,51 @@ describe('Zotero Api Cache Plugin', () => {
 	});
 
 	it('installs an executor', () => {
-		const config = {
-			executors: ['foo', 'bar']
+		const options = {
+			config: {
+				executors: ['foo', 'bar']
+			},
+			ef: function(conf) {
+				return { ...this, ...conf }
+			}
 		};
 		const extender = extenderFactory();
 		assert.isFunction(extender);
 
-		extender(config);
+		const newConfig = extender(options);
 
-		assert.lengthOf(config.executors, 4);
-		assert.isFunction(config.executors[0]);
-		assert.isFunction(config.executors[3]);
+		assert.lengthOf(newConfig.executors, 4);
+		assert.isFunction(newConfig.executors[0]);
+		assert.isFunction(newConfig.executors[3]);
 	});
 
 	it('installs an executor with custom config', () => {
-		const config = {
-			executors: ['foo', 'bar'],
-			method: 'get',
-			resource: {
-				itemTypes: null
+		const options = {
+			config: {
+				executors: ['foo', 'bar'],
+				method: 'get',
+				resource: {
+					itemTypes: null
+				}
+			},
+			ef: function(conf) {
+				return { ...this, ...conf }
 			}
 		};
 		const extender = extenderFactory({
 			prefix: 'foobar',
 			storage: fakeStore
 		});
+		
 		assert.isFunction(extender);
 
-		extender(config);
+		const newConfig = extender(options);
 
-		config.executors[0]({
-			...config, 
+		newConfig.executors[0]({
+			...options.config, 
 			response: new ApiResponse(
 				itemTypesDataFixture,
-				config,
+				options,
 				new Response(itemTypesDataFixture)
 			),
 			source: 'request'

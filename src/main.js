@@ -9,8 +9,13 @@ function extenderFactory(opts = {}) {
 		...opts
 	});
 
-	const extender = function(config) {
-		config.executors = [cacheExecutor, ...config.executors, cacheExecutor];
+	const extender = function(options) {
+		const { config, ef } = options;
+		
+		return ef.bind(config)({
+			executors: [cacheExecutor, ...options.config.executors, cacheExecutor]
+		});
+
 	}
 
 	return extender;

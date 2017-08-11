@@ -6,26 +6,52 @@ const {
 	MultiReadResponse
 } = require('zotero-api-client/lib/response');
 
+const keysWhitelist = [
+	'resource',
+	'apiAuthorityPart',
+	'contentType',
+	'format',
+	'include',
+	'content',
+	'style',
+	'itemKey',
+	'collectionKey',
+	'searchKey',
+	'itemType',
+	'qmode',
+	'since',
+	'tag',
+	'sort',
+	'direction',
+	'limit',
+	'start'
+];
+
 function cache(config) {
 	if(config.method !== 'get') {
-		return { ...config };
+		return config;
 	}
 
-	const options = {
-		...config
-	};
-
-	delete options['response'];
-	delete options['source'];
-	
+	const options = keysWhitelist.reduce((aggr, key) => {
+		if(key in config) {
+			aggr[key] = config[key]
+		}
+		return aggr;
+	}, {});
 
 	const keysToDelete = [];
 	
 	for(let i = 0; i < this.storage.length; i++) {
 		const key = this.storage.key(i);
-		let cacheEntry = JSON.parse(this.storage.getItem(key));
-		if(cacheEntry.expires < Date.now()) {
-			keysToDelete.push(key);
+		if(key.startsWith(this.prefix)) {
+			try {
+				let cacheEntry = JSON.parse(this.storage.getItem(key));			
+				if(cacheEntry.expires < Date.now()) {
+					keysToDelete.push(key);
+				}
+			} catch(_) {
+				keysToDelete.push(key);
+			}
 		}
 	}
 
@@ -86,8 +112,8 @@ function cache(config) {
 				source: 'cache'
 			}
 		}
-		return { ...config };
 	}
+	return { ...config };
 }
 
 module.exports = cache;
