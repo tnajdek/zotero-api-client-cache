@@ -1,5 +1,7 @@
 'use strict';
 
+const { storageFilter } = require('./utils');
+
 const {
 	ApiResponse,
 	SingleReadResponse,
@@ -39,26 +41,8 @@ function cache(config) {
 		return aggr;
 	}, {});
 
-	const keysToDelete = [];
+	storageFilter(this.storage, this.prefix, cacheEntry => cacheEntry.expires < Date.now());
 	
-	for(let i = 0; i < this.storage.length; i++) {
-		const key = this.storage.key(i);
-		if(key.startsWith(this.prefix)) {
-			try {
-				let cacheEntry = JSON.parse(this.storage.getItem(key));			
-				if(cacheEntry.expires < Date.now()) {
-					keysToDelete.push(key);
-				}
-			} catch(_) {
-				keysToDelete.push(key);
-			}
-		}
-	}
-
-	keysToDelete.forEach(key => {
-		this.storage.removeItem(key);
-	});
-
 	const key = `${this.prefix}-${JSON.stringify(options)}`;
 
 	if('response' in config && 'source' in config && config.source != 'cache') {

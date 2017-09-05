@@ -14,7 +14,7 @@ const defaults = require('../src/defaults');
 const itemTypesDataFixture = require('./fixtures/item-types-data');
 const itemFixture = require('./fixtures/item');
 const extenderFactory = require('./../src/main');
-
+const invalidateFactory = require('./../src/invalidate');
 
 class FakeStore {
 	constructor() { this.clear(); }
@@ -233,6 +233,7 @@ describe('Zotero Api Cache Plugin', () => {
 
 	it('installs an executor', () => {
 		const options = {
+			functions: {},
 			config: {
 				executors: ['foo', 'bar']
 			},
@@ -252,6 +253,7 @@ describe('Zotero Api Cache Plugin', () => {
 
 	it('installs an executor with custom config', () => {
 		const options = {
+			functions: {},
 			config: {
 				executors: ['foo', 'bar'],
 				method: 'get',
@@ -283,5 +285,66 @@ describe('Zotero Api Cache Plugin', () => {
 		});
 
 		assert.match(fakeStore.key(0), /^foobar/);
+	});
+
+	it('installs the "invalidate" function', () => {
+		const options = {
+			functions: {},
+			config: {
+				executors: ['foo']
+			},
+			ef: function(conf) {
+				return { ...this, ...conf }
+			}
+		};
+		const extender = extenderFactory();
+		extender(options);
+
+		assert.deepEqual(Object.keys(options.functions), ['invalidate']);
+		assert.isFunction(options.functions.invalidate);
+	});
+
+	it('invalidates cache explicitly', () => {
+		const config = Object.freeze({
+			method: 'get',
+			resource: {
+				itemTypes: null
+			}
+		});
+
+		const stage1 = cache(config);
+		assert.notProperty(stage1, 'response');
+		assert.notProperty(stage1, 'source');
+		
+		const stage2 = cache(Object.freeze({ // eslint-disable-line no-unused-vars
+			...config, 
+			response: new ApiResponse(
+				itemTypesDataFixture,
+				config,
+				new Response(itemTypesDataFixture)
+			),
+			source: 'request'
+		}));
+
+		const stage3 = cache(config);
+		assert.instanceOf(stage3.response, ApiResponse);
+		assert.deepEqual(stage3.response.getData(), itemTypesDataFixture);
+		assert.equal(stage3.source, 'cache');
+
+		let invalidate = invalidateFactory({
+			storage: fakeStore,
+			prefix: 'zotero-api-client-cache',
+			functions: {},
+			config: {},
+			ef: function(conf) {
+				return { ...this, ...conf }
+			}
+		});
+
+		invalidate.bind(config)('itemTypes');
+
+		const stage4 = cache(config);
+		assert.notProperty(stage4, 'response');
+		assert.notProperty(stage4, 'source');
 	});
 });
