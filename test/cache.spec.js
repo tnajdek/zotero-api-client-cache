@@ -32,11 +32,20 @@ class FakeStore {
 }
 
 describe('Zotero Api Cache Plugin', () => {
-	var fakeStore, cache;
+	var fakeStore, cache, invalidate;
 
 	beforeEach(() => {
 		fakeStore = new FakeStore();
 		cache = require('../src/cache').bind({ ...defaults, storage: fakeStore });
+		invalidate = invalidateFactory({
+			storage: fakeStore,
+			prefix: 'zotero-api-client-cache',
+			functions: {},
+			config: {},
+			ef: function(conf) {
+				return { ...this, ...conf }
+			}
+		});
 	});
 
 	it('should cache and return type/field data', () => {
@@ -101,6 +110,7 @@ describe('Zotero Api Cache Plugin', () => {
 			),
 			source: 'request'
 		}));
+
 		const stage3 = cache(configItem1);
 		assert.instanceOf(stage3.response, SingleReadResponse);
 		assert.deepEqual(stage3.response.getData(), itemFixture.data);
@@ -304,7 +314,7 @@ describe('Zotero Api Cache Plugin', () => {
 		assert.isFunction(options.functions.invalidate);
 	});
 
-	it('invalidates cache explicitly', () => {
+	it('invalidates cache', () => {
 		const config = Object.freeze({
 			method: 'get',
 			resource: {
@@ -331,20 +341,63 @@ describe('Zotero Api Cache Plugin', () => {
 		assert.deepEqual(stage3.response.getData(), itemTypesDataFixture);
 		assert.equal(stage3.source, 'cache');
 
-		let invalidate = invalidateFactory({
-			storage: fakeStore,
-			prefix: 'zotero-api-client-cache',
-			functions: {},
-			config: {},
-			ef: function(conf) {
-				return { ...this, ...conf }
-			}
-		});
-
-		invalidate.bind(config)('itemTypes');
+		invalidate('resource.itemTypes');
 
 		const stage4 = cache(config);
 		assert.notProperty(stage4, 'response');
 		assert.notProperty(stage4, 'source');
+	});
+
+	it('invalidates cache with complex targets specifically', () => {
+		const config1 = Object.freeze({
+			method: 'get',
+			limit: 33,
+			resource: {
+				library: 'u123',
+				items: 'ABCD2345'
+			}
+		});
+		const config2 = Object.freeze({
+			method: 'get',
+			limit: 50,
+			resource: {
+				library: 'u123',
+				items: 'ABCD2345'
+			}
+		});
+
+		cache(config1);
+		cache(config2);
+
+		cache(Object.freeze({ // eslint-disable-line no-unused-vars
+			...config1, 
+			response: new ApiResponse(
+				itemFixture,
+				config1,
+				new Response(itemFixture)
+			),
+			source: 'request'
+		}));
+
+		cache(Object.freeze({ // eslint-disable-line no-unused-vars
+			...config2, 
+			response: new ApiResponse(
+				itemFixture,
+				config2,
+				new Response(itemFixture)
+			),
+			source: 'request'
+		}));
+
+		invalidate({'resource.items': 'ABCD2345', 'limit': 33});
+
+		const fromCache1 = cache(config1);
+		assert.notProperty(fromCache1, 'response');
+		assert.notProperty(fromCache1, 'source');
+
+		const fromCache2 = cache(config2);
+		assert.instanceOf(fromCache2.response, ApiResponse);
+		assert.deepEqual(fromCache2.response.getData(), itemFixture);
+		assert.equal(fromCache2.source, 'cache');
 	});
 });

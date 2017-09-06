@@ -22,4 +22,32 @@ const storageFilter = (storage, prefix, filter) => {
 	});
 };
 
-module.exports = { storageFilter };
+const get = (src, path, fallback) => {
+	if(src === null) {
+		return fallback
+	}
+	if(!path || !path.length) {
+		return src;
+	}
+
+	const parts = Array.isArray(path) ? path : path.split('.');
+	
+	var obj = src;
+	var i, ii;
+
+	for(i = 0, ii = parts.length; i < ii; i++) {
+		if(!obj.propertyIsEnumerable(parts[i])) {
+			return fallback;
+		}
+
+		obj = obj[parts[i]];
+
+		if(obj === null) {
+			return (i !== ii - 1) ? fallback : obj;
+		}
+	}
+
+	return obj;
+}
+
+module.exports = { storageFilter, get };
