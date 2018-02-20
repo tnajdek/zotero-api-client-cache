@@ -24,7 +24,7 @@ const storageFilter = (storage, prefix, filter) => {
 
 const get = (src, path, fallback) => {
 	if(src === null) {
-		return fallback
+		return fallback;
 	}
 	if(!path || !path.length) {
 		return src;
