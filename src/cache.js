@@ -56,7 +56,15 @@ function cache(config) {
 			source,
 			options,
 			expires,
-			data: config.response.raw
+			data: config.response.raw,
+			headers: Array.from(
+				config.response.response.headers.entries()
+			).reduce((aggr, header) => {
+				if(header[0]) {
+					aggr[header[0]] = header[1];
+				}
+				return aggr;
+			}, {})
 		});
 
 		this.storage.setItem(key, value);
@@ -65,27 +73,30 @@ function cache(config) {
 	if(!('response' in config)) {
 		const cached = JSON.parse(this.storage.getItem(key));
 		if(cached && cached.expires > Date.now()) {
+			const fakeFetchResponse = new Response(cached.data, {
+				headers: cached.headers
+			});
 			var apiResponse;
 			switch (cached.responseType) {
 				case 'ApiResponse':
 					apiResponse = new ApiResponse(
 						cached.data,
 						cached.options,
-						new Response(cached.data)
+						fakeFetchResponse
 					);
 				break;  
 				case 'SingleReadResponse':
 					apiResponse = new SingleReadResponse(
 						cached.data,
 						cached.options,
-						new Response(cached.data)
+						fakeFetchResponse
 					);
 				break;  
 				case 'MultiReadResponse':
 					apiResponse = new MultiReadResponse(
 						cached.data,
 						cached.options,
-						new Response(cached.data)
+						fakeFetchResponse
 					);
 				break;  
 			}
