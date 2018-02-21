@@ -50,21 +50,20 @@ function cache(config) {
 		const source = config.source;
 		const queryType = Object.keys(config.resource).pop();
 		const expires = Date.now() + 1000 * (this.cacheTimes[queryType] || this.cacheTimes.default || 30);
+		const headers = {};
+		config.response.response.headers.forEach((h, k) => {
+			if(k && h) {
+				headers[k] = h
+			}
+		});
 
 		const value = JSON.stringify({
+			data: config.response.raw,
+			expires,
+			headers,
+			options,
 			responseType,
 			source,
-			options,
-			expires,
-			data: config.response.raw,
-			headers: Array.from(
-				config.response.response.headers.entries()
-			).reduce((aggr, header) => {
-				if(header[0]) {
-					aggr[header[0]] = header[1];
-				}
-				return aggr;
-			}, {})
 		});
 
 		this.storage.setItem(key, value);
