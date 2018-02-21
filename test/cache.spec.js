@@ -33,6 +33,11 @@ class FakeStore {
 
 describe('Zotero Api Cache Plugin', () => {
 	var fakeStore, cache, invalidate;
+	const init = {
+		headers: {
+			'content-type': 'application/json'
+		}
+	};
 
 	beforeEach(() => {
 		fakeStore = new FakeStore();
@@ -65,7 +70,7 @@ describe('Zotero Api Cache Plugin', () => {
 			response: new ApiResponse(
 				itemTypesDataFixture,
 				config,
-				new Response(itemTypesDataFixture)
+				new Response(itemTypesDataFixture, init)
 			),
 			source: 'request'
 		}));
@@ -73,6 +78,7 @@ describe('Zotero Api Cache Plugin', () => {
 
 		assert.instanceOf(stage3.response, ApiResponse);
 		assert.deepEqual(stage3.response.getData(), itemTypesDataFixture);
+		assert.equal(stage3.response.response.headers.get('content-type'), 'application/json');
 		assert.equal(stage3.source, 'cache');
 	});
 
@@ -106,7 +112,7 @@ describe('Zotero Api Cache Plugin', () => {
 			response: new SingleReadResponse(
 				itemFixture,
 				configItem1,
-				new Response(itemFixture)
+				new Response(itemFixture, init)
 			),
 			source: 'request'
 		}));
@@ -147,7 +153,7 @@ describe('Zotero Api Cache Plugin', () => {
 			response: new ApiResponse(
 				itemTypesDataFixture,
 				config,
-				new Response(itemTypesDataFixture)
+				new Response(itemTypesDataFixture, init)
 			),
 			source: 'request'
 		}));
@@ -201,7 +207,7 @@ describe('Zotero Api Cache Plugin', () => {
 			response: new SingleReadResponse(
 				itemFixture,
 				configItem1,
-				new Response(itemFixture)
+				new Response(itemFixture, init)
 			),
 			source: 'request'
 		}));
@@ -211,7 +217,7 @@ describe('Zotero Api Cache Plugin', () => {
 			response: new SingleReadResponse(
 				itemFixture,
 				configItem2,
-				new Response(itemFixture)
+				new Response(itemFixture, init)
 			),
 			source: 'request'
 		}));
@@ -289,7 +295,7 @@ describe('Zotero Api Cache Plugin', () => {
 			response: new ApiResponse(
 				itemTypesDataFixture,
 				options,
-				new Response(itemTypesDataFixture)
+				new Response(itemTypesDataFixture, init)
 			),
 			source: 'request'
 		});
@@ -331,7 +337,7 @@ describe('Zotero Api Cache Plugin', () => {
 			response: new ApiResponse(
 				itemTypesDataFixture,
 				config,
-				new Response(itemTypesDataFixture)
+				new Response(itemTypesDataFixture, init)
 			),
 			source: 'request'
 		}));
@@ -374,7 +380,7 @@ describe('Zotero Api Cache Plugin', () => {
 			response: new ApiResponse(
 				itemFixture,
 				config1,
-				new Response(itemFixture)
+				new Response(itemFixture, init)
 			),
 			source: 'request'
 		}));
@@ -384,7 +390,7 @@ describe('Zotero Api Cache Plugin', () => {
 			response: new ApiResponse(
 				itemFixture,
 				config2,
-				new Response(itemFixture)
+				new Response(itemFixture, init)
 			),
 			source: 'request'
 		}));
