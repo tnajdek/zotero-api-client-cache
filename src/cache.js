@@ -72,8 +72,9 @@ function cache(config) {
 	if(!('response' in config)) {
 		const cached = JSON.parse(this.storage.getItem(key));
 		if(cached && cached.expires > Date.now()) {
-			const fakeFetchResponse = new Response(cached.data, {
-				headers: cached.headers
+			const fakeFetchResponse = new Response(
+				JSON.stringify(cached.data), {
+					headers: cached.headers
 			});
 			var apiResponse;
 			switch (cached.responseType) {
