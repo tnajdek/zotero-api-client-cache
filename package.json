@@ -6,6 +6,11 @@
   "main": "lib/main.js",
   "author": "Tom Najdek",
   "license": "AGPL-3.0",
+  "browserify": {
+    "transform": [
+      "babelify"
+    ]
+  },
   "scripts": {
     "test": "nyc mocha --compilers js:babel-register",
     "coverage": "nyc --reporter=html --reporter=text mocha --compilers js:babel-register",
