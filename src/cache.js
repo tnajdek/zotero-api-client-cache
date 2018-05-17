@@ -46,7 +46,7 @@ function cache(config) {
 	const key = `${this.prefix}-${JSON.stringify(options)}`;
 
 	if('response' in config && 'source' in config && config.source != 'cache') {
-		const responseType = config.response.constructor.name;
+		const responseType = config.response.getResponseType();
 		const source = config.source;
 		const queryType = Object.keys(config.resource).pop();
 		const expires = Date.now() + 1000 * (this.cacheTimes[queryType] || this.cacheTimes.default || 30);
