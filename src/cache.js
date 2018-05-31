@@ -4,8 +4,8 @@ const { storageFilter } = require('./utils');
 
 const {
 	ApiResponse,
+	MultiReadResponse,
 	SingleReadResponse,
-	MultiReadResponse
 } = require('zotero-api-client/lib/response');
 
 const keysWhitelist = [
@@ -29,6 +29,12 @@ const keysWhitelist = [
 	'start'
 ];
 
+const typesWhitelist = [
+	'ApiResponse',
+	'MultiReadResponse',
+	'SingleReadResponse',
+];
+
 function cache(config) {
 	if(config.method !== 'get') {
 		return config;
@@ -47,6 +53,9 @@ function cache(config) {
 
 	if('response' in config && 'source' in config && config.source != 'cache') {
 		const responseType = config.response.getResponseType();
+		if(!typesWhitelist.includes(responseType)) {
+			return config;
+		}
 		const source = config.source;
 		const queryType = Object.keys(config.resource).pop();
 		const expires = Date.now() + 1000 * (this.cacheTimes[queryType] || this.cacheTimes.default || 30);

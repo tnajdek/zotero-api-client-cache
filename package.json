@@ -30,7 +30,7 @@
     "lib/*.js"
   ],
   "peerDependencies": {
-    "zotero-api-client": "^0.12.0"
+    "zotero-api-client": "^0.13.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
@@ -56,6 +56,6 @@
     "timekeeper": "^2.1.2",
     "uglify-js": "^3.3.25",
     "uglifyify": "^5.0.0",
-    "zotero-api-client": "^0.12.0"
+    "zotero-api-client": "^0.13.0"
   }
 }

@@ -7,7 +7,8 @@ const assert = require('chai').assert;
 const tk = require('timekeeper');
 const {
 	ApiResponse,
-	SingleReadResponse
+	SingleReadResponse,
+	FileDownloadResponse,
 } = require('zotero-api-client/lib/response');
 const defaults = require('../src/defaults');
 
@@ -129,6 +130,31 @@ describe('Zotero Api Cache Plugin', () => {
 		const stage3VersionMismatch = cache(configItem3);
 		assert.notProperty(stage3VersionMismatch, 'response');
 		assert.notProperty(stage3VersionMismatch, 'source');
+	});
+
+	it('should only cache whitelisted response types', () => {
+		const configItem1 = Object.freeze({
+			method: 'get',
+			resource: {
+				library: 'u123',
+				items: 'ABCD2345',
+				file: 'null'
+			}
+		});
+
+		const stage2 = cache(Object.freeze({ // eslint-disable-line no-unused-vars
+			...configItem1,
+			response: new FileDownloadResponse(
+				new ArrayBuffer(10),
+				configItem1,
+				new Response(new ArrayBuffer(10))
+			),
+			source: 'request'
+		}));
+
+		const stage3 = cache(configItem1);
+		assert.notProperty(stage3, 'response');
+		assert.notProperty(stage3, 'source');
 	});
 
 	it('should cache for configured time only', () => {
