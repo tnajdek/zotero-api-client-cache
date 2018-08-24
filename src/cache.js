@@ -9,24 +9,25 @@ const {
 } = require('zotero-api-client/lib/response');
 
 const keysWhitelist = [
-	'resource',
 	'apiAuthorityPart',
+	'collectionKey',
+	'content',
 	'contentType',
+	'direction',
 	'format',
 	'include',
-	'content',
-	'style',
 	'itemKey',
-	'collectionKey',
-	'searchKey',
 	'itemType',
-	'qmode',
-	'since',
-	'tag',
-	'sort',
-	'direction',
 	'limit',
-	'start'
+	'q',
+	'qmode',
+	'resource',
+	'searchKey',
+	'since',
+	'sort',
+	'start',
+	'style',
+	'tag',
 ];
 
 const typesWhitelist = [
