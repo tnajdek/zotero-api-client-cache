@@ -2,11 +2,7 @@
 
 const { storageFilter } = require('./utils');
 
-const {
-	ApiResponse,
-	MultiReadResponse,
-	SingleReadResponse,
-} = require('zotero-api-client/lib/response');
+const { ApiResponse, MultiReadResponse, SingleReadResponse, } = require('zotero-api-client');
 
 const keysWhitelist = [
 	'apiAuthorityPart',

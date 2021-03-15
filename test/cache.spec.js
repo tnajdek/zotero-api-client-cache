@@ -1,15 +1,9 @@
 /* eslint-env mocha */
 'use strict';
 
-require('isomorphic-fetch');
-
 const assert = require('chai').assert;
 const tk = require('timekeeper');
-const {
-	ApiResponse,
-	SingleReadResponse,
-	FileDownloadResponse,
-} = require('zotero-api-client/lib/response');
+const { ApiResponse, SingleReadResponse, FileDownloadResponse, } = require('zotero-api-client');
 const defaults = require('../src/defaults');
 
 const itemTypesDataFixture = require('./fixtures/item-types-data');

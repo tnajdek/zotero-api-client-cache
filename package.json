@@ -30,7 +30,7 @@
     "lib/*.js"
   ],
   "peerDependencies": {
-    "zotero-api-client": ">= 0.13.0"
+    "zotero-api-client": ">= 0.35.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.12.8",
