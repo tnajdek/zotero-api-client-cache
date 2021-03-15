@@ -1,6 +1,6 @@
 {
   "name": "zotero-api-client-cache",
-  "version": "0.7.1",
+  "version": "0.8.0",
   "description": "A caching layer for zotero-api-client",
   "repository": "https://github.com/tnajdek/zotero-api-client-cache.git",
   "main": "src/main.js",
